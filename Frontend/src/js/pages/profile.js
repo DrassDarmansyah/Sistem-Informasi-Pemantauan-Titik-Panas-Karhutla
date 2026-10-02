@@ -1,5 +1,5 @@
-import { ApiService } from '../api.js';
-import { Store } from '../store.js';
+import { ApiService } from "../api.js";
+import { Store } from "../store.js";
 
 export function renderProfilePage(container) {
   container.innerHTML = `
@@ -14,7 +14,7 @@ export function renderProfilePage(container) {
 
         <form id="profile-form" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Email / Kontak</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
             <input type="text" id="profile-email" disabled class="w-full bg-gray-900 border border-gray-700 text-gray-400 rounded px-3 py-2 text-sm cursor-not-allowed">
           </div>
 
@@ -35,9 +35,9 @@ export function renderProfilePage(container) {
     </div>
   `;
 
-  const emailInput = document.getElementById('profile-email');
-  const wilayahSelect = document.getElementById('profile-wilayah');
-  const alertEl = document.getElementById('profile-alert');
+  const emailInput = document.getElementById("profile-email");
+  const wilayahSelect = document.getElementById("profile-wilayah");
+  const alertEl = document.getElementById("profile-alert");
 
   // Load Wilayah & Profile
   Promise.all([ApiService.getWilayah(), ApiService.getProfile()])
@@ -45,36 +45,49 @@ export function renderProfilePage(container) {
       emailInput.value = profileData.email;
 
       wilayahSelect.innerHTML = '<option value="">Pilih Wilayah</option>';
-      wilayahList.forEach(w => {
-        const option = document.createElement('option');
+      wilayahList.forEach((w) => {
+        const option = document.createElement("option");
         option.value = w.id;
-        option.textContent = w.nama_wilayah;
-        if (w.id === profileData.wilayah_id) {
+        option.textContent = w.label;
+        if (Number(w.id) === Number(profileData.wilayah_id)) {
           option.selected = true;
         }
         wilayahSelect.appendChild(option);
       });
     })
-    .catch(err => {
-      alertEl.className = 'p-3 rounded text-sm font-medium bg-red-900/50 text-red-300 border border-red-700';
-      alertEl.textContent = 'Gagal memuat profil: ' + err.message;
-      alertEl.classList.remove('hidden');
+    .catch((err) => {
+      alertEl.className =
+        "p-3 rounded text-sm font-medium bg-red-900/50 text-red-300 border border-red-700";
+      alertEl.textContent = "Gagal memuat profil: " + err.message;
+      alertEl.classList.remove("hidden");
     });
 
   // Handle Form Submission
-  document.getElementById('profile-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const newWilayahId = wilayahSelect.value;
+  document
+    .getElementById("profile-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newWilayahId = wilayahSelect.value;
 
-    try {
-      await ApiService.updateProfile({ wilayah_id: newWilayahId });
-      alertEl.className = 'p-3 rounded text-sm font-medium bg-green-900/50 text-green-300 border border-green-700';
-      alertEl.textContent = 'Wilayah notifikasi berhasil diperbarui!';
-      alertEl.classList.remove('hidden');
-    } catch (err) {
-      alertEl.className = 'p-3 rounded text-sm font-medium bg-red-900/50 text-red-300 border border-red-700';
-      alertEl.textContent = 'Gagal memperbarui: ' + err.message;
-      alertEl.classList.remove('hidden');
-    }
-  });
+      if (!newWilayahId) {
+        alertEl.className =
+          "p-3 rounded text-sm font-medium bg-red-900/50 text-red-300 border border-red-700";
+        alertEl.textContent = "Silakan pilih wilayah terlebih dahulu.";
+        alertEl.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        await ApiService.updateProfile({ wilayah_id: Number(newWilayahId) });
+        alertEl.className =
+          "p-3 rounded text-sm font-medium bg-green-900/50 text-green-300 border border-green-700";
+        alertEl.textContent = "Wilayah notifikasi berhasil diperbarui!";
+        alertEl.classList.remove("hidden");
+      } catch (err) {
+        alertEl.className =
+          "p-3 rounded text-sm font-medium bg-red-900/50 text-red-300 border border-red-700";
+        alertEl.textContent = "Gagal memperbarui: " + err.message;
+        alertEl.classList.remove("hidden");
+      }
+    });
 }

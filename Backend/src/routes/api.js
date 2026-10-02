@@ -225,7 +225,7 @@ router.get(
  * /profile:
  *   put:
  *     tags: [Profile]
- *     summary: Ubah nomor WhatsApp & wilayah notifikasi
+ *     summary: Ubah wilayah notifikasi
  *     description: Khusus role "warga". Perubahan wilayah_id langsung dipakai untuk pencocokan notifikasi berikutnya.
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -236,7 +236,6 @@ router.get(
  *             type: object
  *             required: [wilayah_id]
  *             properties:
- *               phone: { type: string, example: "081234567891" }
  *               wilayah_id: { type: integer, example: 2 }
  *     responses:
  *       200:
@@ -246,7 +245,7 @@ router.get(
  *       403:
  *         description: Akun bukan role "warga".
  *       422:
- *         description: Validasi gagal (nomor sudah dipakai, wilayah tidak valid).
+ *         description: Validasi gagal (wilayah tidak valid).
  *         content:
  *           application/json:
  *             schema: { $ref: '#/components/schemas/ErrorResponse' }
