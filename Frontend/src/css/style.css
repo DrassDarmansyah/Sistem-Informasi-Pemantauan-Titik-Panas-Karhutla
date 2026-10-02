@@ -1,0 +1,13 @@
+#map-preview, #main-map {
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border: 1px solid #374151;
+}
+
+.leaflet-container {
+  font-family: inherit;
+}
