@@ -28,25 +28,27 @@ const indexValidators = [
     .withMessage("end_date harus >= start_date."),
   query("confidence")
     .optional({ checkFalsy: true })
+    .customSanitizer((v) => String(v).toLowerCase())
     .isIn(["low", "medium", "high"])
     .withMessage("The selected confidence is invalid."),
 ];
 
 async function index(req, res, next) {
   try {
-    if (respondIfInvalid(req, res, "Parameter filter tidak valid.")) return;
+    if (respondIfInvalid(req, res, "Parameter tidak valid.")) return;
 
+    // Filter opsional dari peta: ?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD&confidence=low|medium|high
     const { start_date, end_date, confidence } = req.query;
     const where = {};
-
     if (start_date || end_date) {
       where.acq_date = {};
       if (start_date) where.acq_date[Op.gte] = start_date;
       if (end_date) where.acq_date[Op.lte] = end_date;
     }
-    if (confidence) where.confidence_level = confidence;
+    if (["low", "medium", "high"].includes(confidence)) {
+      where.confidence_level = confidence;
+    }
 
-    // Story #16:
     const hotspots = await Hotspot.findAll({
       where,
       attributes: [

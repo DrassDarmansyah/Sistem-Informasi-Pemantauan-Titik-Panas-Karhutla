@@ -1,6 +1,6 @@
-import { ApiService } from '../api.js';
-import { Store } from '../store.js';
-import { Router } from '../router.js';
+import { ApiService } from "../api.js";
+import { Store } from "../store.js";
+import { Router } from "../router.js";
 
 export function renderLoginPage(container) {
   container.innerHTML = `
@@ -12,7 +12,7 @@ export function renderLoginPage(container) {
 
         <form id="login-form" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Email / Kontak</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
             <input type="text" id="login-email" required class="w-full bg-gray-900 border border-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500">
           </div>
 
@@ -33,25 +33,27 @@ export function renderLoginPage(container) {
     </div>
   `;
 
-  document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    const errorEl = document.getElementById('login-error');
+  document
+    .getElementById("login-form")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+      const errorEl = document.getElementById("login-error");
 
-    try {
-      const res = await ApiService.login({ email, password });
-      ApiService.setToken(res.token);
-      Store.setUser(res.user);
+      try {
+        const res = await ApiService.login({ email, password });
+        ApiService.setToken(res.token);
+        Store.setUser(res.user);
 
-      if (res.user.role === 'operator') {
-        Router.navigate('/dashboard');
-      } else {
-        Router.navigate('/map');
+        if (res.user.role === "operator") {
+          Router.navigate("/dashboard");
+        } else {
+          Router.navigate("/map");
+        }
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.remove("hidden");
       }
-    } catch (err) {
-      errorEl.textContent = err.message;
-      errorEl.classList.remove('hidden');
-    }
-  });
+    });
 }
