@@ -1,4 +1,6 @@
 const { Sequelize } = require("sequelize");
+const fs = require("fs");
+const path = require("path");
 
 const sequelize = new Sequelize(
   process.env.DB_DATABASE || "karhutla_monitoring_node",
@@ -9,6 +11,14 @@ const sequelize = new Sequelize(
     port: Number(process.env.DB_PORT || 3306),
     dialect: "mysql",
     logging: false,
+
+    dialectOptions: {
+      ssl: {
+        ca: fs.readFileSync(path.join(__dirname, "../../certs/isrgrootx1.pem")),
+        rejectUnauthorized: true,
+      },
+    },
+
     define: {
       underscored: true,
       timestamps: true,
