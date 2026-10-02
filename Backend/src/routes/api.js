@@ -150,12 +150,53 @@ router.post("/auth/logout", authenticate, authController.logout);
  *   get:
  *     tags: [Hotspots]
  *     summary: Daftar titik panas
- *     description: Publik, tanpa token. Maks. 500 baris, terbaru lebih dulu.
+ *     description: Publik, tanpa token. Bisa difilter kombinasi beberapa parameter sekaligus. Maks. 500 baris.
+ *     parameters:
+ *       - in: query
+ *         name: start_date
+ *         schema: { type: string, format: date, example: "2026-09-01" }
+ *         description: Format Y-m-d.
+ *       - in: query
+ *         name: end_date
+ *         schema: { type: string, format: date, example: "2026-09-30" }
+ *         description: Format Y-m-d, harus >= start_date.
+ *       - in: query
+ *         name: confidence
+ *         schema: { type: string, enum: [low, medium, high] }
  *     responses:
  *       200:
  *         description: Daftar titik panas berhasil diambil.
+ *       422:
+ *         description: Parameter filter tidak valid.
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
  */
-router.get("/hotspots", hotspotController.index);
+router.get(
+  "/hotspots",
+  hotspotController.indexValidators,
+  hotspotController.index,
+);
+
+/**
+ * @swagger
+ * /hotspots/{id}:
+ *   get:
+ *     tags: [Hotspots]
+ *     summary: Detail satu titik panas
+ *     description: Publik, tanpa token.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Detail titik panas ditemukan.
+ *       404:
+ *         description: ID tidak ditemukan.
+ */
+router.get("/hotspots/:id", hotspotController.show);
 
 /**
  * @swagger
