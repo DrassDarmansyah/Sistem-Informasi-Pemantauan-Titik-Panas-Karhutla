@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Login() {
+export default function Login({ onNavigate }) {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -21,7 +21,8 @@ export default function Login() {
       const data = await response.json();
       if (response.ok) {
         alert('Login berhasil!');
-        localStorage.setItem('token', data.token);
+        if (data.token) localStorage.setItem('token', data.token);
+        if (onNavigate) onNavigate('home');
       } else {
         alert(data.message || 'Login gagal.');
       }
@@ -31,19 +32,22 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-      <h2>Masuk ke VINIX7</h2>
+    <div style={{ maxWidth: '400px', margin: '40px auto', padding: '24px', border: '1px solid #e2e8f0', borderRadius: '12px', backgroundColor: '#1a202c', color: '#fff' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Masuk ke VINIX7</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>
-          <label>Email</label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} required style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
+          <label>Email / No. HP</label>
+          <input type="email" name="email" value={formData.email} onChange={handleChange} required style={{ width: '100%', padding: '10px', marginTop: '6px', borderRadius: '6px', border: '1px solid #4a5568', backgroundColor: '#2d3748', color: '#fff' }} />
         </div>
-        <div style={{ marginBottom: '15px' }}>
+        <div style={{ marginBottom: '20px' }}>
           <label>Password</label>
-          <input type="password" name="password" value={formData.password} onChange={handleChange} required style={{ width: '100%', padding: '8px', marginTop: '5px' }} />
+          <input type="password" name="password" value={formData.password} onChange={handleChange} required style={{ width: '100%', padding: '10px', marginTop: '6px', borderRadius: '6px', border: '1px solid #4a5568', backgroundColor: '#2d3748', color: '#fff' }} />
         </div>
-        <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#3182ce', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Masuk</button>
+        <button type="submit" style={{ width: '100%', padding: '12px', backgroundColor: '#3182ce', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>Masuk</button>
       </form>
+      <p style={{ marginTop: '15px', textAlign: 'center', fontSize: '14px' }}>
+        Belum punya akun? <span onClick={() => onNavigate && onNavigate('register')} style={{ color: '#63b3ed', cursor: 'pointer', textDecoration: 'underline' }}>Daftar Warga</span>
+      </p>
     </div>
   );
 }
