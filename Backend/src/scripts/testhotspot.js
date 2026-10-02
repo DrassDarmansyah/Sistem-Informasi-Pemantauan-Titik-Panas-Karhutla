@@ -2,6 +2,8 @@ require("dotenv").config();
 const { Hotspot } = require("../models");
 const hotspotMatchingService = require("../services/hotspotMatchingService");
 
+//menjalankan : node src/scripts/testhotspot.js
+
 async function main() {
   const hotspot = await Hotspot.create({
     latitude: 1.6,

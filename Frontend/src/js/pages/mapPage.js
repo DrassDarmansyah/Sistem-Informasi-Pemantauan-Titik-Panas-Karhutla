@@ -1,5 +1,5 @@
-import { HotspotMap } from '../components/map.js';
-import { ApiService } from '../api.js';
+import { HotspotMap } from "../components/map.js";
+import { ApiService } from "../api.js";
 
 export function renderMapPage(container) {
   container.innerHTML = `
@@ -23,9 +23,9 @@ export function renderMapPage(container) {
             <label class="text-xs text-gray-400 font-medium mb-1">Tingkat Kepercayaan</label>
             <select id="confidence" class="bg-gray-900 border border-gray-700 text-white rounded px-3 py-1.5 text-sm focus:outline-none focus:border-red-500">
               <option value="">Semua</option>
-              <option value="LOW">Rendah (LOW)</option>
-              <option value="MEDIUM">Sedang (MEDIUM)</option>
-              <option value="HIGH">Tinggi (HIGH)</option>
+              <option value="low">Rendah (LOW)</option>
+              <option value="medium">Sedang (MEDIUM)</option>
+              <option value="high">Tinggi (HIGH)</option>
             </select>
           </div>
 
@@ -52,23 +52,23 @@ export function renderMapPage(container) {
     </div>
   `;
 
-  const mapComponent = new HotspotMap('main-map');
+  const mapComponent = new HotspotMap("main-map");
   mapComponent.init();
 
   const loadMapData = (filters = {}) => {
-    const loadingEl = document.getElementById('filter-loading');
-    loadingEl.classList.remove('hidden');
-    loadingEl.classList.add('flex');
+    const loadingEl = document.getElementById("filter-loading");
+    loadingEl.classList.remove("hidden");
+    loadingEl.classList.add("flex");
 
     ApiService.getHotspots(filters)
-      .then(data => {
+      .then((data) => {
         mapComponent.renderHotspots(data);
         mapComponent.invalidateSize();
       })
-      .catch(err => alert("Gagal mengambil data titik panas: " + err.message))
+      .catch((err) => alert("Gagal mengambil data titik panas: " + err.message))
       .finally(() => {
-        loadingEl.classList.add('hidden');
-        loadingEl.classList.remove('flex');
+        loadingEl.classList.add("hidden");
+        loadingEl.classList.remove("flex");
       });
   };
 
@@ -76,11 +76,11 @@ export function renderMapPage(container) {
   loadMapData();
 
   // Handle Filter Submit
-  document.getElementById('filter-form').addEventListener('submit', (e) => {
+  document.getElementById("filter-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
-    const confidence = document.getElementById('confidence').value;
+    const startDate = document.getElementById("start_date").value;
+    const endDate = document.getElementById("end_date").value;
+    const confidence = document.getElementById("confidence").value;
 
     const filters = {};
     if (startDate) filters.start_date = startDate;
@@ -91,10 +91,10 @@ export function renderMapPage(container) {
   });
 
   // Handle Reset Filter
-  document.getElementById('btn-reset').addEventListener('click', () => {
-    document.getElementById('start_date').value = '';
-    document.getElementById('end_date').value = '';
-    document.getElementById('confidence').value = '';
+  document.getElementById("btn-reset").addEventListener("click", () => {
+    document.getElementById("start_date").value = "";
+    document.getElementById("end_date").value = "";
+    document.getElementById("confidence").value = "";
     loadMapData();
   });
 }

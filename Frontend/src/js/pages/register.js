@@ -1,5 +1,5 @@
-import { ApiService } from '../api.js';
-import { Router } from '../router.js';
+import { ApiService } from "../api.js";
+import { Router } from "../router.js";
 
 export function renderRegisterPage(container) {
   container.innerHTML = `
@@ -11,13 +11,23 @@ export function renderRegisterPage(container) {
 
         <form id="reg-form" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Email / No HP</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Nama Lengkap</label>
+            <input type="text" id="reg-name" required class="w-full bg-gray-900 border border-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
             <input type="text" id="reg-email" required class="w-full bg-gray-900 border border-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500">
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
             <input type="password" id="reg-password" required class="w-full bg-gray-900 border border-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Konfirmasi Password</label>
+            <input type="password" id="reg-password-confirm" required class="w-full bg-gray-900 border border-gray-700 text-white rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500">
           </div>
 
           <div>
@@ -39,30 +49,47 @@ export function renderRegisterPage(container) {
     </div>
   `;
 
-  const wilayahSelect = document.getElementById('reg-wilayah');
+  const wilayahSelect = document.getElementById("reg-wilayah");
   ApiService.getWilayah()
-    .then(list => {
+    .then((list) => {
       wilayahSelect.innerHTML = '<option value="">Pilih Wilayah</option>';
-      list.forEach(w => {
-        wilayahSelect.innerHTML += `<option value="${w.id}">${w.nama_wilayah}</option>`;
+      list.forEach((w) => {
+        wilayahSelect.innerHTML += `<option value="${w.id}">${w.label}</option>`;
       });
     })
-    .catch(err => console.error("Gagal memuat wilayah", err));
+    .catch((err) => console.error("Gagal memuat wilayah", err));
 
-  document.getElementById('reg-form').addEventListener('submit', async (e) => {
+  document.getElementById("reg-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
+    const name = document.getElementById("reg-name").value.trim();
+    const email = document.getElementById("reg-email").value;
+    const password = document.getElementById("reg-password").value;
+    const passwordConfirm = document.getElementById(
+      "reg-password-confirm",
+    ).value;
     const wilayah_id = wilayahSelect.value;
-    const errorEl = document.getElementById('reg-error');
+    const errorEl = document.getElementById("reg-error");
+
+    if (password !== passwordConfirm) {
+      errorEl.textContent = "Konfirmasi password tidak sama dengan password.";
+      errorEl.classList.remove("hidden");
+      return;
+    }
+    errorEl.classList.add("hidden");
 
     try {
-      await ApiService.register({ email, password, wilayah_id });
+      await ApiService.register({
+        name,
+        email,
+        password,
+        password_confirmation: passwordConfirm,
+        wilayah_id: Number(wilayah_id),
+      });
       alert("Registrasi Berhasil! Silakan masuk.");
-      Router.navigate('/login');
+      Router.navigate("/login");
     } catch (err) {
       errorEl.textContent = err.message;
-      errorEl.classList.remove('hidden');
+      errorEl.classList.remove("hidden");
     }
   });
 }

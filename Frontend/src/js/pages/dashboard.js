@@ -1,5 +1,5 @@
-import { ApiService } from '../api.js';
-import { renderTrendChart } from '../components/chart.js';
+import { ApiService } from "../api.js";
+import { renderTrendChart } from "../components/chart.js";
 
 export function renderDashboardPage(container) {
   container.innerHTML = `
@@ -47,29 +47,33 @@ export function renderDashboardPage(container) {
 
   // Fetch Agregasi
   ApiService.getSummary()
-    .then(data => {
+    .then((data) => {
       // 1. Render Chart
       if (data.trend) {
-        renderTrendChart('trendChart', data.trend);
+        renderTrendChart("trendChart", data.trend);
       }
 
       // 2. Render Table
-      const tbody = document.getElementById('summary-table-body');
-      if (data.regionalSummary && data.regionalSummary.length > 0) {
-        tbody.innerHTML = data.regionalSummary.map(row => `
+      const tbody = document.getElementById("summary-table-body");
+      if (data.per_wilayah && data.per_wilayah.length > 0) {
+        tbody.innerHTML = data.per_wilayah
+          .map(
+            (row) => `
           <tr class="hover:bg-gray-750">
-            <td class="py-3 px-4 font-semibold text-white">${row.nama_wilayah}</td>
+            <td class="py-3 px-4 font-semibold text-white">${row.wilayah || "(Tanpa wilayah)"}</td>
             <td class="py-3 px-4 font-bold text-red-400">${row.total}</td>
             <td class="py-3 px-4 text-red-500">${row.high || 0}</td>
             <td class="py-3 px-4 text-yellow-500">${row.medium || 0}</td>
             <td class="py-3 px-4 text-blue-500">${row.low || 0}</td>
           </tr>
-        `).join('');
+        `,
+          )
+          .join("");
       } else {
         tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-gray-400">Tidak ada data rekapitulasi.</td></tr>`;
       }
     })
-    .catch(err => {
+    .catch((err) => {
       alert("Gagal memuat dashboard operator: " + err.message);
     });
 }

@@ -1,5 +1,5 @@
 const { query } = require("express-validator");
-const { Op, fn, col } = require("sequelize");
+const { Op, fn, col, literal } = require("sequelize");
 const { Hotspot, Wilayah } = require("../models");
 const { respondIfInvalid } = require("../utils/validate");
 
@@ -17,13 +17,18 @@ const indexValidators = [
     .isInt()
     .withMessage("wilayah_id tidak valid."),
   query("start_date")
+    .optional({ checkFalsy: true })
     .custom(isValidDate)
     .withMessage("Format tanggal tidak valid (Y-m-d)."),
   query("end_date")
+    .optional({ checkFalsy: true })
     .custom(isValidDate)
     .withMessage("Format tanggal tidak valid (Y-m-d).")
     .bail()
-    .custom((value, { req }) => value >= req.query.start_date)
+    .custom(
+      (value, { req }) =>
+        !req.query.start_date || value >= req.query.start_date,
+    )
     .withMessage("end_date harus >= start_date."),
 ];
 
@@ -43,9 +48,12 @@ async function index(req, res, next) {
       }
     }
 
-    const baseWhere = {
-      acq_date: { [Op.gte]: start_date, [Op.lte]: end_date },
-    };
+    const baseWhere = {};
+    if (start_date || end_date) {
+      baseWhere.acq_date = {};
+      if (start_date) baseWhere.acq_date[Op.gte] = start_date;
+      if (end_date) baseWhere.acq_date[Op.lte] = end_date;
+    }
     if (wilayah_id) baseWhere.wilayah_id = wilayah_id;
 
     const total = await Hotspot.count({ where: baseWhere });
@@ -69,7 +77,13 @@ async function index(req, res, next) {
 
     const perWilayahRows = await Hotspot.findAll({
       where: perWilayahWhere,
-      attributes: ["wilayah_id", [fn("COUNT", col("id")), "total"]],
+      attributes: [
+        "wilayah_id",
+        [fn("COUNT", col("id")), "total"],
+        [fn("SUM", literal("confidence_level = 'high'")), "high"],
+        [fn("SUM", literal("confidence_level = 'medium'")), "medium"],
+        [fn("SUM", literal("confidence_level = 'low'")), "low"],
+      ],
       group: ["wilayah_id"],
       raw: true,
     });
@@ -88,6 +102,9 @@ async function index(req, res, next) {
         ? wilayahById.get(row.wilayah_id).label
         : null,
       total: Number(row.total),
+      high: Number(row.high),
+      medium: Number(row.medium),
+      low: Number(row.low),
     }));
 
     // Tren harian (untuk grafik)
