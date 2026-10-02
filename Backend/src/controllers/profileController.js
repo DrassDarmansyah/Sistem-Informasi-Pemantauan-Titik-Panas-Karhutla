@@ -30,12 +30,6 @@ async function show(req, res, next) {
 }
 
 const updateValidators = [
-  body("phone")
-    .optional({ nullable: true, checkFalsy: true })
-    .isString()
-    .isLength({ max: 20 })
-    .matches(/^\+?[0-9\-\s]{8,20}$/)
-    .withMessage("Format nomor WhatsApp tidak valid."),
   body("wilayah_id").isInt().withMessage("Wilayah wajib dipilih."),
 ];
 
@@ -43,19 +37,10 @@ async function update(req, res, next) {
   try {
     if (respondIfInvalid(req, res)) return;
 
-    const { phone, wilayah_id } = req.body;
+    const { wilayah_id } = req.body;
     const user = req.user;
 
     const errors = {};
-
-    if (phone) {
-      const phoneTaken = await User.findOne({
-        where: { phone },
-      });
-      if (phoneTaken && phoneTaken.id !== user.id) {
-        errors.phone = ["Nomor ini sudah terdaftar pada akun lain."];
-      }
-    }
 
     const wilayah = await Wilayah.findByPk(wilayah_id);
     if (!wilayah) {
@@ -68,15 +53,14 @@ async function update(req, res, next) {
         .json({ message: "Data yang dikirim tidak valid.", errors });
     }
 
-    user.phone = phone ?? null;
-    user.wilayah_id = wilayah_id;
+    user.wilayah_id = Number(wilayah_id);
     await user.save();
 
     // AC: perubahan langsung dipakai utk matching notifikasi berikutnya -> otomatis benar,
     // karena HotspotMatchingService selalu query tabel users terbaru saat ada hotspot baru.
     return res.json({
       message: "Profil berhasil diperbarui.",
-      data: { id: user.id, phone: user.phone, wilayah_id: user.wilayah_id },
+      data: { id: user.id, email: user.email, wilayah_id: user.wilayah_id },
     });
   } catch (e) {
     next(e);
