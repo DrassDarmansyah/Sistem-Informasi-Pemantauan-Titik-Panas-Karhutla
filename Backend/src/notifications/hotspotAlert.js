@@ -22,7 +22,11 @@ function buildHotspotAlert(user, hotspot) {
     `[PERINGATAN KARHUTLA] Titik panas terdeteksi di ${hotspot.latitude},${hotspot.longitude} ` +
     `pada ${waktu}. Tingkat kepercayaan: ${hotspot.confidence_level}.`;
 
-  const appUrl = process.env.APP_URL || "http://localhost:8000";
+  // Link ke halaman peta di FRONTEND (routing frontend memakai hash: /#/map),
+  const frontendUrl = (
+    process.env.FRONTEND_URL || "http://localhost:3000"
+  ).replace(/\/+$/, "");
+  const mapUrl = `${frontendUrl}/#/map`;
 
   const html = `
     <p>Halo ${user.name},</p>
@@ -31,7 +35,7 @@ function buildHotspotAlert(user, hotspot) {
     <p>Waktu deteksi: ${waktu}</p>
     <p>Tingkat kepercayaan: ${confidenceLabel}</p>
     <p>Mohon tetap waspada dan pantau perkembangan melalui peta pemantauan.</p>
-    <p><a href="${appUrl}/peta">Lihat Peta Pemantauan</a></p>
+    <p><a href="${mapUrl}">Lihat Peta Pemantauan</a></p>
     <p>Ini adalah notifikasi otomatis dari Sistem Pemantauan Karhutla.</p>
   `;
 
@@ -41,7 +45,7 @@ function buildHotspotAlert(user, hotspot) {
     `Lokasi: ${hotspot.latitude}, ${hotspot.longitude}\n` +
     `Waktu deteksi: ${waktu}\n` +
     `Tingkat kepercayaan: ${confidenceLabel}\n\n` +
-    `Mohon tetap waspada dan pantau perkembangan melalui peta pemantauan: ${appUrl}/peta\n\n` +
+    `Mohon tetap waspada dan pantau perkembangan melalui peta pemantauan: ${mapUrl}\n\n` +
     `Ini adalah notifikasi otomatis dari Sistem Pemantauan Karhutla.`;
 
   return { subject, text, html, plainText };
