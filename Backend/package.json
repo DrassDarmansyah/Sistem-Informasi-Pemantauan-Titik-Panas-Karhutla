@@ -1,7 +1,7 @@
 {
   "name": "karhutla-backend",
   "version": "1.0.0",
-  "description": "Karhutla monitoring backend (Node.js + Express) — converted from Laravel",
+  "description": "Karhutla monitoring backend (Node.js + Express)",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
@@ -32,6 +32,6 @@
     "nodemon": "^3.1.7"
   },
   "engines": {
-    "node": ">=18"
+    "node": "24.x"
   }
 }

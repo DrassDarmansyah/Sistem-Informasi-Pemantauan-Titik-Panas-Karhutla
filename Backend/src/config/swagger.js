@@ -1,4 +1,5 @@
 const swaggerJsdoc = require("swagger-jsdoc");
+const path = require("path");
 
 /**
  * Konfigurasi OpenAPI (dibaca dari komentar @swagger di file routes/api.js).
@@ -61,7 +62,7 @@ const options = {
     },
   },
   // File-file yang dipindai untuk mencari komentar @swagger
-  apis: ["./src/routes/*.js"],
+  apis: [path.join(__dirname, "../routes/*.js").replace(/\\/g, "/")],
 };
 
 module.exports = swaggerJsdoc(options);
