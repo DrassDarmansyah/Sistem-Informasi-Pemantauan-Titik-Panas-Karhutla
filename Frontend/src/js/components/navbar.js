@@ -10,7 +10,7 @@ export function renderNavbar() {
     <nav class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex justify-between items-center shadow-lg">
       <div class="flex items-center space-x-6">
         <a href="#/" class="text-2xl font-black text-red-500 tracking-wider flex items-center gap-2">
-          🔥 VINIX7
+           SeeKarhutla
         </a>
         <div class="hidden md:flex space-x-4">
           <a href="#/map" class="text-gray-300 hover:text-red-400 font-medium transition">Peta Sebaran</a>
